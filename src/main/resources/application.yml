@@ -27,9 +27,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/expert
-    username: root
-    password: myjoin*
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     properties:
@@ -41,4 +41,4 @@ spring:
 
 jwt:
   secret:
-    key: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+    key: ${JWT_SECRET_KEY}
