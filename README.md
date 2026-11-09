@@ -298,16 +298,10 @@ erDiagram
 
 ### 테스트 커버리지
 
-| 측정 항목 | 커버리지 |
-|---|---:|
-| Class | 44% |
-| Method | 32% |
-| Line | 26% |
-| Branch | 10% |
-
-> IntelliJ IDEA Coverage 실행 결과를 기준으로 작성했습니다.
+> IntelliJ IDEA Coverage 실행 결과입니다.
 
 <!-- 아래 위치에 IntelliJ Coverage 결과 이미지 첨부 -->
+![Test Coverage](images/test-coverage.jpg)
 <!-- 예: ![Test Coverage](images/test-coverage.png) -->
 
 ## 10. 트러블슈팅
