@@ -49,18 +49,27 @@ public class TodoService {
 
     @Transactional(readOnly = true)
     public Page<TodoResponse> getTodos(int page, int size) {
+
+        if (page < 1) {
+            throw new InvalidRequestException("페이지 번호는 1 이상이어야 합니다.");
+        }
+
+        if (size < 1) {
+            throw new InvalidRequestException("페이지 크기는 1 이상이어야 합니다.");
+        }
+
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
 
         return todos.map(todo -> new TodoResponse(
-                todo.getId(),
-                todo.getTitle(),
-                todo.getContents(),
-                todo.getWeather(),
-                new UserResponse(todo.getUser().getId(), todo.getUser().getEmail()),
-                todo.getCreatedAt(),
-                todo.getModifiedAt()
+            todo.getId(),
+            todo.getTitle(),
+            todo.getContents(),
+            todo.getWeather(),
+            new UserResponse(todo.getUser().getId(), todo.getUser().getEmail()),
+            todo.getCreatedAt(),
+            todo.getModifiedAt()
         ));
     }
 

@@ -1,4 +1,3 @@
-
 package org.example.expert.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,11 +9,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,28 +31,26 @@ public class AdminApiLoggingAspect {
 	)
 	public Object logAdminApi(ProceedingJoinPoint joinPoint) throws Throwable {
 
-		ServletRequestAttributes attributes =
-			(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		RequestAttributes requestAttributes =
+			RequestContextHolder.getRequestAttributes();
+
+		if (!(requestAttributes instanceof ServletRequestAttributes attributes)) {
+			log.warn("HTTP 요청 정보를 가져올 수 없습니다.");
+			return joinPoint.proceed();
+		}
 
 		HttpServletRequest request = attributes.getRequest();
 
-		Object userId = request.getAttribute("userId");
-
-		LocalDateTime requestTime = LocalDateTime.now();
-		String requestUrl = request.getRequestURL().toString();
-
-		// Controller 메서드에 전달되는 인자
-		Object[] requestBody = joinPoint.getArgs();
-
 		Map<String, Object> logData = new LinkedHashMap<>();
 
-		logData.put("userId", userId);
-		logData.put("requestTime", requestTime);
-		logData.put("requestUrl", requestUrl);
-		logData.put("requestBody", requestBody);
+		logData.put("userId", request.getAttribute("userId"));
+		logData.put("requestTime", LocalDateTime.now());
+		logData.put("requestUrl", request.getRequestURL().toString());
+
+		// Controller 메서드에 전달된 전체 인자
+		logData.put("requestArguments", joinPoint.getArgs());
 
 		try {
-			// 실제 Controller 메서드 실행
 			Object responseBody = joinPoint.proceed();
 
 			logData.put("responseBody", responseBody);
@@ -64,7 +61,7 @@ public class AdminApiLoggingAspect {
 
 		} catch (Throwable e) {
 
-			logData.put("responseBody", e.getMessage());
+			logData.put("errorMessage", e.getMessage());
 
 			log.error("Admin API Error Log: {}", toJson(logData), e);
 
